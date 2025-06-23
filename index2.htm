@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎮 Movie Invite</title>
+  <style>
+    body {
+      font-family:Georgia, 'Times New Roman', Times, serif;
+      background: #550000;
+      text-align: center;
+      padding-top: 50px;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    #container {
+      background-color: rgb(255, 237, 213);
+      width: 500px;
+      border-radius: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      margin: auto;
+      transition: height 0.6s ease;
+      height: 300px;
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+    }
+
+    #container.expanded {
+      height: auto;
+    }
+
+    #buttons button {
+      margin: 20px;
+      padding: 15px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    #yesBtn {
+      background-color: #6bcf63;
+      color: white;
+    }
+
+    #noBtn {
+      background-color: #f08080;
+      color: white;
+    }
+
+    #animationArea {
+      margin-top: 40px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .bouquet {
+  position: relative;
+  width: 160px;
+  height: 50px;
+  margin: 20px auto 0;
+  transform: scale(1.2);
+}
+
+.flower {
+  width: 50px;
+  height: 60px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 0;
+  transform-origin: bottom center;
+  animation: popIn 0.6s ease forwards;
+}
+
+.flower:nth-child(1) {
+  background-image: url('1f.png');
+  left: 10px;
+  transform: rotate(-35deg);
+  animation-delay: 0.1s;
+}
+.flower:nth-child(2) {
+  background-image: url('2f.png');
+  left: 30px;
+  transform: rotate(-15deg);
+  animation-delay: 0.2s;
+}
+.flower:nth-child(3) {
+  background-image: url('3f.png');
+  left: 55px;
+  transform: rotate(0deg);
+  animation-delay: 0.3s;
+}
+.flower:nth-child(4) {
+  background-image: url('1f.png');
+  left: 80px;
+  transform: rotate(15deg);
+  animation-delay: 0.4s;
+}
+.flower:nth-child(5) {
+  background-image: url('2f.png');
+  left: 105px;
+  transform: rotate(30deg);
+  animation-delay: 0.5s;
+}
+
+
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .firework-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .fire-particle {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: yellow;
+      opacity: 0;
+      animation: explode 1s ease-out forwards;
+      box-shadow: 0 0 25px white;
+    }
+
+    @keyframes explode {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--dx), var(--dy)) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    .emoji {
+      position: fixed;
+      top: -40px;
+      font-size: 30px;
+      animation: fall linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-40px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    #fakeModal {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -30%);
+      background-color: #ececec;
+      border: 2px solid #000;
+      box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+      z-index: 9999;
+      width: 350px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .modalContent {
+      padding: 10px;
+    }
+
+    .modalHeader {
+      display: flex;
+      justify-content: space-between;
+      background-color: #1a73e8;
+      color: white;
+      padding: 5px 10px;
+      font-weight: bold;
+    }
+
+    .closeBtn {
+      cursor: pointer;
+    }
+
+    .modalBody {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .modalBody button {
+      background-color: #4caf50;
+      color: white;
+      padding: 8px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    a {
+      color: #550000;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0% { transform: translate(-50%, -30%) rotate(0deg); }
+      25% { transform: translate(-52%, -32%) rotate(-2deg); }
+      50% { transform: translate(-48%, -28%) rotate(2deg); }
+      75% { transform: translate(-51%, -31%) rotate(-1deg); }
+      100% { transform: translate(-50%, -30%) rotate(0deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="firework-container" id="fireworkCanvas"></div>
+
+  <div id="container">
+    <h1>Wanna watch a movie together? 🎥🍿</h1>
+    <div id="buttons">
+      <button id="yesBtn">Yes! 🎐</button>
+      <button id="noBtn">No 😢</button>
+    </div>
+    <div id="animationArea"></div>
+  </div>
+
+  <script>
+    let fireworkInterval;
+    let emojiRainInterval;
+
+    window.onload = function () {
+      const container = document.getElementById("container");
+      const animationArea = document.getElementById("animationArea");
+
+      document.getElementById("yesBtn").addEventListener("click", () => {
+        container.classList.add("expanded");
+        removeEmojiRain();
+        startFireworks();
+
+        animationArea.innerHTML = `
+          <h2>Yayy! 🎉</h2>
+        
+          <img src="https://media.giphy.com/media/3oEjHP8ELRNNlnlLGM/giphy.gif" width="300">
+          <p><a href="${generateGoogleCalendarURL()}" target="_blank">Add to Google Calendar 📅</a></p>
+
+          <div class="bouquet">
+            <div class="flower"></div>
+            <div class="flower"></div>
+            <div class="flower"></div>
+            <div class="flower"></div>
+            <div class="flower"></div>
+            
+          </div>
+        `;
+      });
+
+      document.getElementById("noBtn").addEventListener("click", () => {
+        container.classList.remove("expanded");
+        animationArea.innerHTML = "";
+        stopFireworks();
+        startEmojiRain();
+        showAnnoyingModal();
+      });
+    };
+
+    function generateGoogleCalendarURL() {
+      return "https://calendar.app.google/nsmYUfNnHetykBiv9";
+    }
+
+    function startFireworks() {
+      stopFireworks();
+      fireworkInterval = setInterval(() => {
+        const container = document.getElementById("fireworkCanvas");
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        const colors = ['#ff3f34', '#ffdd59', '#32ff7e', '#18dcff', '#7d5fff', '#ff9f1a'];
+
+        for (let i = 0; i < 15; i++) {
+          const particle = document.createElement("div");
+          particle.className = "fire-particle";
+          const angle = (Math.PI * 2 * i) / 15;
+          const distance = 140 + Math.random() * 40;
+          const dx = Math.cos(angle) * distance + "px";
+          const dy = Math.sin(angle) * distance + "px";
+
+          particle.style.left = `${x}px`;
+          particle.style.top = `${y}px`;
+          particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          particle.style.setProperty('--dx', dx);
+          particle.style.setProperty('--dy', dy);
+
+          container.appendChild(particle);
+          setTimeout(() => particle.remove(), 1000);
+        }
+      }, 300);
+    }
+
+    function stopFireworks() {
+      clearInterval(fireworkInterval);
+      document.querySelectorAll(".fire-particle").forEach(p => p.remove());
+    }
+
+    function startEmojiRain() {
+      emojiRainInterval = setInterval(() => {
+        const emoji = document.createElement("div");
+        emoji.className = "emoji";
+        emoji.innerText = "😢";
+        emoji.style.left = Math.random() * 100 + "vw";
+        emoji.style.animationDuration = (2 + Math.random() * 2) + "s";
+        document.body.appendChild(emoji);
+        setTimeout(() => emoji.remove(), 5000);
+      }, 100);
+    }
+
+    function removeEmojiRain() {
+      clearInterval(emojiRainInterval);
+      document.querySelectorAll(".emoji").forEach(e => e.remove());
+    }
+
+    function showAnnoyingModal() {
+      if (!document.getElementById("fakeModal")) {
+        const modal = document.createElement("div");
+        modal.id = "fakeModal";
+        modal.innerHTML = `
+          <div class="modalContent">
+            <div class="modalHeader">
+              <span class="modalTitle">Windows Alert</span>
+              <span class="closeBtn" id="fakeClose">&times;</span>
+            </div>
+            <div class="modalBody">
+              <p>Are you really saying no to me? 🥺</p>
+              <button onclick="goBackToQuestion()">Go Back</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById("fakeClose").addEventListener("click", () => {
+          modal.classList.remove("shake");
+          void modal.offsetWidth;
+          modal.classList.add("shake");
+        });
+      }
+    }
+
+    function goBackToQuestion() {
+      const modal = document.getElementById("fakeModal");
+      if (modal) modal.remove();
+      document.getElementById("animationArea").innerHTML = "";
+      removeEmojiRain();
+    }
+  </script>
+</body>
+</html>
